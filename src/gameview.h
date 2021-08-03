@@ -4,6 +4,7 @@
 #include <QGraphicsProxyWidget>
 #include <QTimer>
 
+#include "soundmanager.h"
 #include "keyevents.h"
 
 class OneBox;
@@ -70,4 +71,5 @@ private:
     BoxGroup* down_box_group_;
     BoxGroup* next_box_group_;
     QGamepad* gamepad_;
+    SoundManager sound_mgr_;
 };

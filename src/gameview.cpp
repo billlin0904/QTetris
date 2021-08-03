@@ -133,16 +133,12 @@ void GameView::clearFullRows() {
 	}
 
 	if (rows_.count() > 0) {
-		play(ThemeManager::clearSound());
+		sound_mgr_.playClearSound();
 		QTimer::singleShot(400, this, SLOT(moveBox()));
 	}
 	else {
 		spawnBoxUpdateNextBox();
 	}
-}
-
-void GameView::play(QString const& file) {
-	QSound::play(file);
 }
 
 void GameView::moveBox() {
@@ -168,7 +164,7 @@ void GameView::spawnBoxUpdateNextBox() {
 	box_group_->createBox(QPointF(300, 70), next_box_group_->boxShape());
 	next_box_group_->clearBoxGroup(true);
 	next_box_group_->createBox(QPointF(500, 70));
-	play(ThemeManager::fallSound());
+	sound_mgr_.playFallSound();
 }
 
 void GameView::pauseGame() {

@@ -4,7 +4,7 @@
         <file>box_90.png</file>
         <file>box_180.png</file>
         <file>box_270.png</file>
-        <file>clear.wav</file>
-        <file>fall.wav</file>
+        <file>sound/clear.wav</file>
+        <file>sound/fall.wav</file>
     </qresource>
 </RCC>
