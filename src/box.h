@@ -26,7 +26,11 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
     QPainterPath shape() const;
+
+    void rotate(bool anti);
+
 private:
+    int angle_{0};
     QColor color_;
 };
 

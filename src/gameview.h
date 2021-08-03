@@ -8,6 +8,7 @@
 
 class OneBox;
 class BoxGroup;
+
 class QGamepad;
 class QGraphicsBlurEffect;
 
@@ -45,7 +46,8 @@ private:
 
     void initGame();
 
-    bool hold_down_btn_lock_{ false };
+    void play(QString const &file);
+
     qreal game_speed_;
     QList<int> rows_;
 
@@ -65,6 +67,7 @@ private:
     QGraphicsTextItem* game_over_text_;
 
     BoxGroup* box_group_;
+    BoxGroup* down_box_group_;
     BoxGroup* next_box_group_;
     QGamepad* gamepad_;
 };

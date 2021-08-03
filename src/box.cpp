@@ -5,7 +5,6 @@
 
 #include "thememmanager.h"
 #include "box.h"
-#include <stack>
 
 static const std::array<QColor, 7> kColorTable{
    QColor(200, 0, 0, 100),
@@ -20,6 +19,7 @@ static const std::array<QColor, 7> kColorTable{
 static BoxShapes getBoxShape() {
 	// https://simon.lc/the-history-of-tetris-randomizers
 	static std::vector<BoxShapes> k7Bag;
+	static BoxShapes last_shape_id = BoxShapes::RandomShape;
 
 	if (k7Bag.empty()) {
 		std::vector<BoxShapes> default_bag{
@@ -34,9 +34,14 @@ static BoxShapes getBoxShape() {
 		k7Bag = default_bag;
 	}
 
-	std::random_shuffle(k7Bag.begin(), k7Bag.end());
+	BoxShapes shape_id = BoxShapes::RandomShape;
 
-	auto shape_id = k7Bag.back();
+	// Avoid random a same shape!
+	while (shape_id == last_shape_id) {
+		std::random_shuffle(k7Bag.begin(), k7Bag.end());
+		shape_id = k7Bag.back();
+	}	
+
 	k7Bag.pop_back();
 	return shape_id;
 }
@@ -68,7 +73,7 @@ QRectF OneBox::boundingRect() const {
 }
 
 void OneBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
-	painter->drawPixmap(-10, -10, 20, 20, ThemeManager::box());
+	painter->drawPixmap(-10, -10, 20, 20, ThemeManager::box(angle_));
 	painter->setBrush(color_);
 	QColor pen_color = color_;
 	pen_color.setAlpha(20);
@@ -80,6 +85,25 @@ QPainterPath OneBox::shape() const {
 	QPainterPath path;
 	path.addRect(-9.5, -9.5, 19, 19);
 	return path;
+}
+
+void OneBox::rotate(bool anti) {
+	if (!anti) {
+		if (angle_ - 90 < 0) {
+			angle_ = 270;
+		}
+		else {
+			angle_ -= 90;
+		}
+	}
+	else {
+		if (angle_ + 90 == 360) {
+			angle_ = 0;
+		}
+		else {
+			angle_ += 90;
+		}
+	}
 }
 
 BoxGroup::BoxGroup()
@@ -109,6 +133,9 @@ void BoxGroup::keyPressEvent(QKeyEvent* event) {
 	case Qt::Key_Space:
 		keyPress(KeyEvents::KeyRotate);
 		break;
+	case Qt::Key_Alt:
+		keyPress(KeyEvents::KeyAntiRotate);
+		break;
 	}
 }
 
@@ -122,23 +149,24 @@ void BoxGroup::moveOneStep() {
 }
 
 void BoxGroup::keyPress(KeyEvents event) {
-#define rotate(angle) setTransform(QTransform().rotate(angle), true)
+#define rotate(angle, anti) \
+	setTransform(QTransform().rotate(angle), true); \
+	foreach(item, childItems()) {\
+		auto box = dynamic_cast<OneBox*>(item);\
+		box->rotate(anti);\
+	}
+
+	QGraphicsItem* item = nullptr;
 
 	switch (event) {
 	case KeyEvents::KeyDown:
-		/*moveBy(0, 20);
+		moveBy(0, 20);
 		while (!isColliding()) {
 			moveBy(0, 20);
 		}
 		moveBy(0, -20);
 		clearBoxGroup();
-		emit newBox();*/
-		if (!isColliding()) {
-			moveBy(0, 20);
-		}
-		else {
-			moveBy(0, -20);
-		}
+		emit newBox();
 		break;
 	case KeyEvents::KeyLeft:
 		moveBy(-20, 0);
@@ -153,10 +181,13 @@ void BoxGroup::keyPress(KeyEvents event) {
 		}
 		break;
 	case KeyEvents::KeyRotate:
-		rotate(90);
+		rotate(90, false);
 		if (isColliding()) {
-			rotate(-90);
+			rotate(-90, false);
 		}
+		break;
+	case KeyEvents::KeyAntiRotate:
+		rotate(-90, true);
 		break;
 	}
 }

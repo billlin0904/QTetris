@@ -1,4 +1,10 @@
 <RCC>
-    <qresource prefix="QTetris">
+    <qresource prefix="/QTetris">
+        <file>box.png</file>
+        <file>box_90.png</file>
+        <file>box_180.png</file>
+        <file>box_270.png</file>
+        <file>clear.wav</file>
+        <file>fall.wav</file>
     </qresource>
 </RCC>

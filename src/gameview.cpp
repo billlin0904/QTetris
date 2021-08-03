@@ -3,6 +3,7 @@
 #include <QGraphicsScene>
 #include <QGamepad>
 #include <QDebug>
+#include <QSound>
 
 #include "thememmanager.h"
 #include "box.h"
@@ -28,10 +29,11 @@ void GameView::init() {
 	scene->setBackgroundBrush(ThemeManager::background());
 	setScene(scene);
 
-	top_line_ = scene->addLine(197, 47, 403, 47);
-	bottom_line_ = scene->addLine(197, 453, 403, 453);
-	left_line_ = scene->addLine(197, 47, 197, 453);
-	right_line_ = scene->addLine(403, 47, 403, 453);
+	// Game stage 4 line
+	top_line_ = scene->addLine(197, 47, 403, 47, ThemeManager::linePen());
+	bottom_line_ = scene->addLine(197, 453, 403, 453, ThemeManager::linePen());
+	left_line_ = scene->addLine(197, 47, 197, 453, ThemeManager::linePen());
+	right_line_ = scene->addLine(403, 47, 403, 453, ThemeManager::linePen());
 	
 	box_group_ = new BoxGroup();
 	QObject::connect(box_group_, SIGNAL(newBox()), this, SLOT(clearFullRows()));
@@ -65,11 +67,7 @@ void GameView::init() {
 
 	gamepad_ = new QGamepad(0, this);
 	QObject::connect(gamepad_, &QGamepad::buttonDownChanged, this, [=](bool value) {
-		qDebug() << "Button down";
-		//if (!hold_down_btn_lock_) {
-		//	hold_down_btn_lock_ = true;
-			box_group_->keyPress(KeyEvents::KeyDown);			
-		//}
+		box_group_->keyPress(KeyEvents::KeyDown);
 		});
 	QObject::connect(gamepad_, &QGamepad::buttonRightChanged, this, [=](bool value) {
 		box_group_->keyPress(KeyEvents::KeyRight);
@@ -89,7 +87,7 @@ void GameView::initGame() {
 	game_speed_ = kDefaultSpeed;
 	box_group_->startTimer(kDefaultSpeed);
 	next_box_group_->createBox(QPoint(500, 70));
-	scene()->setBackgroundBrush(ThemeManager::initGameBackground());
+	scene()->setBackgroundBrush(ThemeManager::gameBackground());
 
 	game_score_->show();
 	game_level_->show();
@@ -135,6 +133,7 @@ void GameView::clearFullRows() {
 	}
 
 	if (rows_.count() > 0) {
+		play(ThemeManager::clearSound());
 		QTimer::singleShot(400, this, SLOT(moveBox()));
 	}
 	else {
@@ -142,10 +141,14 @@ void GameView::clearFullRows() {
 	}
 }
 
+void GameView::play(QString const& file) {
+	QSound::play(file);
+}
+
 void GameView::moveBox() {
 	for (int i = rows_.count(); i > 0; --i) {
 		auto row = rows_.at(i - 1);
-		foreach(QGraphicsItem * item, 
+		foreach(auto * item, 
 			scene()->items(
 				199, 
 				49,
@@ -165,7 +168,7 @@ void GameView::spawnBoxUpdateNextBox() {
 	box_group_->createBox(QPointF(300, 70), next_box_group_->boxShape());
 	next_box_group_->clearBoxGroup(true);
 	next_box_group_->createBox(QPointF(500, 70));
-	hold_down_btn_lock_ = false;
+	play(ThemeManager::fallSound());
 }
 
 void GameView::pauseGame() {
@@ -196,7 +199,7 @@ void GameView::restartGame() {
 	box_group_->clearBoxGroup();
 	box_group_->hide();
 
-	foreach(QGraphicsItem * item,
+	foreach(auto * item,
 		scene()->items(
 			199,
 			49,
