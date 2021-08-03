@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <array>
 #include <random>
+#include <algorithm>
 
 #include "thememmanager.h"
 #include "box.h"
@@ -20,6 +21,7 @@ static BoxShapes getBoxShape() {
 	// https://simon.lc/the-history-of-tetris-randomizers
 	static std::vector<BoxShapes> k7Bag;
 	static BoxShapes last_shape_id = BoxShapes::RandomShape;
+    static auto engines = std::mt19937(std::random_device()());
 
 	if (k7Bag.empty()) {
 		std::vector<BoxShapes> default_bag{
@@ -38,7 +40,7 @@ static BoxShapes getBoxShape() {
 
 	// Avoid random a same shape!
 	while (shape_id == last_shape_id) {
-		std::random_shuffle(k7Bag.begin(), k7Bag.end());
+        std::shuffle(k7Bag.begin(), k7Bag.end(), engines);
 		shape_id = k7Bag.back();
 	}	
 
