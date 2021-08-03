@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QTetris", "QTetris.vcxproj", "{E0879449-0418-4B45-B3EB-8D9A88B4DA41}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E0879449-0418-4B45-B3EB-8D9A88B4DA41}.Debug|x64.ActiveCfg = Debug|x64
+		{E0879449-0418-4B45-B3EB-8D9A88B4DA41}.Debug|x64.Build.0 = Debug|x64
+		{E0879449-0418-4B45-B3EB-8D9A88B4DA41}.Release|x64.ActiveCfg = Release|x64
+		{E0879449-0418-4B45-B3EB-8D9A88B4DA41}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {25D6B7E1-28D7-4B90-8BE2-AFED773848D4}
+	EndGlobalSection
+EndGlobal
