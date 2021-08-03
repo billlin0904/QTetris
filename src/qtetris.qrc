@@ -6,5 +6,8 @@
         <file>box_270.png</file>
         <file>sound/clear.wav</file>
         <file>sound/fall.wav</file>
+        <file>sound/gameover.wav</file>
+        <file>sound/rotate.wav</file>
+        <file>sound/move.wav</file>
     </qresource>
 </RCC>

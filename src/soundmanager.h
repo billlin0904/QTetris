@@ -1,22 +1,8 @@
 #pragma once
 
-#include <QThread>
 #include <QMediaPlayer>
 
-class SoundEffectWorker : public QObject {
-	Q_OBJECT
-public:
-	SoundEffectWorker();
-
-public slots:
-	void onPlay(QString const &file, int duration);
-
-private:
-	QMediaPlayer player_;
-};
-
-class SoundManager : public QObject {
-	Q_OBJECT
+class SoundManager {
 public:
 	SoundManager();
 
@@ -26,10 +12,14 @@ public:
 
 	void playFallSound();
 
-signals:
-	void play(QString const& file, int duration);
+	void playGameOver();
+
+	void playRotateSound();
+
+	void playMoveSound();
 
 private:
-	QThread thread_;
-	SoundEffectWorker worker_;
+	void play(int index, QUrl const &file);
+
+	QMediaPlayer player_[5];
 };

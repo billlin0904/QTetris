@@ -57,6 +57,8 @@ signals:
 
     void gameFinished();
 
+    void updateKeyPress(KeyEvents event);
+
 public slots:
     void moveOneStep();
 

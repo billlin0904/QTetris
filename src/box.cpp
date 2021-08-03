@@ -192,6 +192,8 @@ void BoxGroup::keyPress(KeyEvents event) {
 		rotate(-90, true);
 		break;
 	}
+
+	emit updateKeyPress(event);
 }
 
 bool BoxGroup::isColliding() const {

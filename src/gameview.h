@@ -36,7 +36,7 @@ public slots:
     void updateScore(int full_row_num);
 
 protected:
-    void keyPressEvent(QKeyEvent* event);
+    void drawBackground(QPainter* painter, const QRectF& rect);
 
 private:
     void spawnBoxUpdateNextBox();

@@ -20,13 +20,23 @@ public:
 	}
 
 	static QString clearSound() {
-		//return ":/QTetris/sound/clear.wav";
-		return "C:\\Users\\rdbill0452\\Documents\\Github\\QTetris\\src\\\sound\\clear.wav";
+		return "qrc:/QTetris/sound/clear.wav";
+	}
+
+	static QString moveSound() {
+		return "qrc:/QTetris/sound/move.wav";
 	}
 
 	static QString fallSound() {
-		//return ":/QTetris/sound/fall.wav";
-		return "C:\\Users\\rdbill0452\\Documents\\Github\\QTetris\\src\\\sound\\fall.wav";
+		return "qrc:/QTetris/sound/fall.wav";
+	}
+
+	static QString gameOverSound() {
+		return "qrc:/QTetris/sound/gameover.wav";
+	}
+
+	static QString rotateSound() {
+		return "qrc:/QTetris/sound/rotate.wav";
 	}
 
 	static QPen linePen() {

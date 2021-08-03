@@ -78,6 +78,29 @@ void GameView::init() {
 	QObject::connect(gamepad_, &QGamepad::buttonAChanged, this, [=](bool pressed) {
 		box_group_->keyPress(KeyEvents::KeyRotate);
 		});
+	QObject::connect(gamepad_, &QGamepad::buttonBChanged, this, [=](bool pressed) {
+		box_group_->keyPress(KeyEvents::KeyAntiRotate);
+		});
+
+	QObject::connect(box_group_, &BoxGroup::updateKeyPress, [this](KeyEvents event) {
+		switch (event) {
+		case KeyEvents::KeyDown:
+			sound_mgr_.playFallSound();
+			break;
+		case KeyEvents::KeyLeft:
+			sound_mgr_.playMoveSound();
+			break;
+		case KeyEvents::KeyRight:
+			sound_mgr_.playMoveSound();
+			break;
+		case KeyEvents::KeyRotate:
+			sound_mgr_.playRotateSound();
+			break;
+		case KeyEvents::KeyAntiRotate:
+			sound_mgr_.playRotateSound();
+			break;
+		}
+		});
 }
 
 void GameView::initGame() {
@@ -164,7 +187,6 @@ void GameView::spawnBoxUpdateNextBox() {
 	box_group_->createBox(QPointF(300, 70), next_box_group_->boxShape());
 	next_box_group_->clearBoxGroup(true);
 	next_box_group_->createBox(QPointF(500, 70));
-	sound_mgr_.playFallSound();
 }
 
 void GameView::pauseGame() {
@@ -181,12 +203,40 @@ void GameView::updateScore(int full_row_num) {
 
 }
 
-void GameView::gameOver() {
-	restartGame();
+void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
+	auto gridSize = 20;
+
+	QRectF const rect {
+		200,
+		50,
+		200,
+		400,
+	};
+
+	painter->setBrush(QBrush(QColor(87, 206, 187)));
+	painter->drawRect(view_rect);
+
+	painter->setBrush(QBrush(QColor(12, 12, 11)));
+	painter->drawRect(rect);
+
+	painter->setPen(QColor(53, 53, 52));
+	qreal left = rect.left();
+	qreal top = rect.top();
+
+	QVarLengthArray<QLineF, 100> lines;
+	for (qreal x = left; x < rect.right(); x += gridSize) {
+		lines.append(QLineF(x, rect.top(), x, rect.bottom()));
+	}
+		
+	for (qreal y = top; y < rect.bottom(); y += gridSize) {
+		lines.append(QLineF(rect.left(), y, rect.right(), y));
+	}
+
+	painter->drawLines(lines.data(), lines.size());
 }
 
-void GameView::keyPressEvent(QKeyEvent* event) {
-	QGraphicsView::keyPressEvent(event);
+void GameView::gameOver() {
+	restartGame();
 }
 
 void GameView::restartGame() {
