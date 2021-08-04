@@ -14,7 +14,7 @@ void SoundManager::playClearSound() {
 }
 
 void SoundManager::playFallSound() {
-	play(1, QUrl(ThemeManager::fallSound()));
+    play(1, QUrl(ThemeManager::fallSound()));
 }
 
 void SoundManager::playGameOver() {

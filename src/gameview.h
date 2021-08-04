@@ -36,7 +36,7 @@ public slots:
     void updateScore(int full_row_num);
 
 protected:
-    void drawBackground(QPainter* painter, const QRectF& rect);
+    void drawBackground(QPainter* painter, const QRectF& rect) override;
 
 private:
     void spawnBoxUpdateNextBox();

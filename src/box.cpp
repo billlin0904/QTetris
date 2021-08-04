@@ -23,6 +23,8 @@ static BoxShapes getBoxShape() {
 	static BoxShapes last_shape_id = BoxShapes::RandomShape;
     static auto engines = std::mt19937(std::random_device()());
 
+    //return BoxShapes::OShape;
+
 	if (k7Bag.empty()) {
 		std::vector<BoxShapes> default_bag{
 		BoxShapes::IShape,
@@ -36,7 +38,7 @@ static BoxShapes getBoxShape() {
 		k7Bag = default_bag;
 	}
 
-	BoxShapes shape_id = BoxShapes::RandomShape;
+    auto shape_id = BoxShapes::RandomShape;
 
 	// Avoid random a same shape!
 	while (shape_id == last_shape_id) {
@@ -162,6 +164,7 @@ void BoxGroup::keyPress(KeyEvents event) {
 
 	switch (event) {
 	case KeyEvents::KeyDown:
+        /*
 		moveBy(0, 20);
 		while (!isColliding()) {
 			moveBy(0, 20);
@@ -169,6 +172,8 @@ void BoxGroup::keyPress(KeyEvents event) {
 		moveBy(0, -20);
 		clearBoxGroup();
 		emit newBox();
+        */
+        moveOneStep();
 		break;
 	case KeyEvents::KeyLeft:
 		moveBy(-20, 0);

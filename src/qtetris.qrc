@@ -9,5 +9,6 @@
         <file>sound/gameover.wav</file>
         <file>sound/rotate.wav</file>
         <file>sound/move.wav</file>
+        <file>background/background.jpg</file>
     </qresource>
 </RCC>

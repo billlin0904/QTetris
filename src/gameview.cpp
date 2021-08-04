@@ -9,7 +9,7 @@
 #include "box.h"
 #include "gameview.h"
 
-static auto constexpr kDefaultSpeed = 500;
+static auto constexpr kDefaultSpeed = 300;
 
 GameView::GameView(QWidget* parent)
 	: QGraphicsView(parent) {
@@ -213,8 +213,10 @@ void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
 		400,
 	};
 
-	painter->setBrush(QBrush(QColor(87, 206, 187)));
-	painter->drawRect(view_rect);
+    painter->drawImage(view_rect, QImage(":/QTetris/background/background.jpg"));
+
+    //painter->setBrush(QBrush(QColor(87, 206, 187)));
+    //painter->drawRect(view_rect);
 
 	painter->setBrush(QBrush(QColor(12, 12, 11)));
 	painter->drawRect(rect);

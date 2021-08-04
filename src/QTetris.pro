@@ -12,9 +12,11 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 HEADERS += ./keyevents.h \
     ./thememmanager.h \
+    ./soundmanager.h \
     ./box.h \
     ./gameview.h
 SOURCES += ./box.cpp \
+    ./soundmanagercpp.cpp \
     ./gameview.cpp \
     ./main.cpp
 RESOURCES += qtetris.qrc
