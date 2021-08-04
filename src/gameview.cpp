@@ -2,7 +2,6 @@
 #include <QPropertyAnimation>
 #include <QGraphicsScene>
 #include <QGamepad>
-#include <QDebug>
 #include <QSound>
 
 #include "thememmanager.h"
@@ -12,7 +11,8 @@
 static auto constexpr kDefaultSpeed = 300;
 
 GameView::GameView(QWidget* parent)
-	: QGraphicsView(parent) {
+	: QGraphicsView(parent)
+	, background_(ThemeManager::backgroundImage()) {
 	init();
 }
 
@@ -29,7 +29,6 @@ void GameView::init() {
 	scene->setBackgroundBrush(ThemeManager::background());
 	setScene(scene);
 
-	// Game stage 4 line
 	top_line_ = scene->addLine(197, 47, 403, 47, ThemeManager::linePen());
 	bottom_line_ = scene->addLine(197, 453, 403, 453, ThemeManager::linePen());
 	left_line_ = scene->addLine(197, 47, 197, 453, ThemeManager::linePen());
@@ -42,6 +41,9 @@ void GameView::init() {
 
 	next_box_group_ = new BoxGroup();
 	scene->addItem(next_box_group_);
+
+	hint_box_group_ = new BoxGroup();
+	scene->addItem(hint_box_group_);
 
 	game_score_ = new QGraphicsTextItem("0");
 	game_score_->setFont(ThemeManager::font());
@@ -105,6 +107,9 @@ void GameView::init() {
 
 void GameView::initGame() {
 	box_group_->createBox(QPointF(300, 70));
+	hint_box_group_->createBox(QPoint(300, 432), box_group_->boxShape(), box_group_->color());
+	hint_box_group_->setOpacity(30);
+
 	box_group_->setFocus();
 
 	game_speed_ = kDefaultSpeed;
@@ -213,7 +218,7 @@ void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
 		400,
 	};
 
-    painter->drawImage(view_rect, QImage(":/QTetris/background/background.jpg"));
+    painter->drawImage(view_rect, background_);
 
     //painter->setBrush(QBrush(QColor(87, 206, 187)));
     //painter->drawRect(view_rect);

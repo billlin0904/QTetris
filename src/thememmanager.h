@@ -19,6 +19,10 @@ public:
 		return QPixmap(":/QTetris/box_270.png");
 	}
 
+	static QString backgroundImage() {
+		return ":/QTetris/background/background.jpg";
+	}
+
 	static QString clearSound() {
 		return "qrc:/QTetris/sound/clear.wav";
 	}

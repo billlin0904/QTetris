@@ -3,6 +3,7 @@
 #include <QGraphicsView>
 #include <QGraphicsProxyWidget>
 #include <QTimer>
+#include <QImage>
 
 #include "soundmanager.h"
 #include "keyevents.h"
@@ -68,8 +69,9 @@ private:
     QGraphicsTextItem* game_over_text_;
 
     BoxGroup* box_group_;
-    BoxGroup* down_box_group_;
+    BoxGroup* hint_box_group_;
     BoxGroup* next_box_group_;
     QGamepad* gamepad_;
     SoundManager sound_mgr_;
+    QImage background_;
 };

@@ -43,11 +43,15 @@ public:
 
     void clearBoxGroup(bool destroy_box = false);
 
+    void createBox(const QPointF& point, BoxShapes shape, QColor color);
+
     void createBox(const QPointF& point, BoxShapes shape = RandomShape);
 
     bool isColliding() const;
 
     BoxShapes boxShape() const;
+
+    QColor color() const;
 
 protected:
     void keyPressEvent(QKeyEvent* event);
@@ -72,4 +76,5 @@ private:
     BoxShapes shape_;
     QTransform old_transform_;
     QTimer timer_;
+    QColor color_;
 };

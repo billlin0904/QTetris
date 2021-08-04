@@ -1,8 +1,9 @@
-﻿#include <QKeyEvent>
-#include <QPainter>
-#include <array>
+﻿#include <array>
 #include <random>
 #include <algorithm>
+
+#include <QKeyEvent>
+#include <QPainter>
 
 #include "thememmanager.h"
 #include "box.h"
@@ -25,28 +26,33 @@ static BoxShapes getBoxShape() {
 
     //return BoxShapes::OShape;
 
-	if (k7Bag.empty()) {
-		std::vector<BoxShapes> default_bag{
-		BoxShapes::IShape,
-		BoxShapes::JShape,
-		BoxShapes::LShape,
-		BoxShapes::OShape,
-		BoxShapes::SShape,
-		BoxShapes::TShape,
-		BoxShapes::ZShape
-		};
-		k7Bag = default_bag;
-	}
-
-    auto shape_id = BoxShapes::RandomShape;
+	auto shape_id = BoxShapes::RandomShape;
 
 	// Avoid random a same shape!
-	while (shape_id == last_shape_id) {
+	while (true) {
+		if (k7Bag.empty()) {
+			std::vector<BoxShapes> default_bag{
+			BoxShapes::IShape,
+			BoxShapes::JShape,
+			BoxShapes::LShape,
+			BoxShapes::OShape,
+			BoxShapes::SShape,
+			BoxShapes::TShape,
+			BoxShapes::ZShape
+			};
+			k7Bag = default_bag;
+		}
+
         std::shuffle(k7Bag.begin(), k7Bag.end(), engines);
 		shape_id = k7Bag.back();
-	}	
+		k7Bag.pop_back();
 
-	k7Bag.pop_back();
+		if (shape_id != last_shape_id) {
+			break;
+		}
+	}
+
+	last_shape_id = shape_id;
 	return shape_id;
 }
 
@@ -204,8 +210,7 @@ void BoxGroup::keyPress(KeyEvents event) {
 bool BoxGroup::isColliding() const {
 	auto item_list = childItems();
 
-	QGraphicsItem* item = nullptr;
-	foreach(item, item_list) {
+	foreach(auto item, item_list) {
 		if (item->collidingItems().count() > 1) {
 			return true;
 		}
@@ -216,8 +221,7 @@ bool BoxGroup::isColliding() const {
 void BoxGroup::clearBoxGroup(bool destroy_box) {
 	auto item_list = childItems();
 
-	QGraphicsItem* item = nullptr;
-	foreach(item, item_list) {
+	foreach(auto item, item_list) {
 		removeFromGroup(item);
 		if (destroy_box) {
 			auto box = dynamic_cast<OneBox*>(item);
@@ -226,24 +230,15 @@ void BoxGroup::clearBoxGroup(bool destroy_box) {
 	}
 }
 
+QColor BoxGroup::color() const {
+	return color_;
+}
+
 BoxShapes BoxGroup::boxShape() const {
 	return shape_;
 }
 
-void BoxGroup::createBox(const QPointF& point, BoxShapes shape) {
-	int shape_id;
-	QColor color;
-
-	if (shape == RandomShape) {
-		const auto random_shape = RandomShape::makeRandomShape();
-		shape_id = random_shape.shape;
-		color = random_shape.color;
-	}
-	else {
-		shape_id = shape;
-		color = kColorTable[shape_id];
-	}
-
+void BoxGroup::createBox(const QPointF& point, BoxShapes shape, QColor color) {
 	QList<OneBox*> list;
 	setTransform(old_transform_);
 
@@ -253,7 +248,7 @@ void BoxGroup::createBox(const QPointF& point, BoxShapes shape) {
 		addToGroup(temp);
 	}
 
-	switch (shape_id) {
+	switch (shape) {
 	case IShape:
 		shape_ = IShape;
 		list.at(0)->setPos(-30, -10);
@@ -310,6 +305,25 @@ void BoxGroup::createBox(const QPointF& point, BoxShapes shape) {
 		stopTimer();
 		emit gameFinished();
 	}
+
+	color_ = color;
+}
+
+void BoxGroup::createBox(const QPointF& point, BoxShapes shape) {
+	int shape_id;
+	QColor color;
+
+	if (shape == RandomShape) {
+		const auto random_shape = RandomShape::makeRandomShape();
+		shape_id = random_shape.shape;
+		color = random_shape.color;
+	}
+	else {
+		shape_id = shape;
+		color = kColorTable[shape_id];
+	}
+
+	createBox(point, static_cast<BoxShapes>(shape_id), color);
 }
 
 void BoxGroup::stopTimer() {
