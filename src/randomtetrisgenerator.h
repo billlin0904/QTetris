@@ -1,6 +1,11 @@
 #pragma once
 
+#include <array>
+#include <random>
+#include <algorithm>
+
 #include <QColor>
+#include <vector>
 
 enum BoxShapes {
     IShape,
@@ -13,14 +18,25 @@ enum BoxShapes {
     RandomShape
 };
 
+QColor getShapeColor(BoxShapes shape);
+
 class RandomTetrisGenerator {
 public:
-	static RandomTetrisGenerator& get();
-	
-    BoxShapes makeBoxShape() const;
+    virtual ~RandomTetrisGenerator() = default;
 
-	QColor getShapeColor(BoxShapes shape) const;
+    virtual BoxShapes makeBoxShape() = 0;
+
+protected:
+    RandomTetrisGenerator() = default;
+};
+
+class Tetris7BagGenerator : public RandomTetrisGenerator {
+public:
+    Tetris7BagGenerator();
+
+    BoxShapes makeBoxShape() override;
 
 private:
-	RandomTetrisGenerator() = default;
+    std::mt19937 engine_;
+    std::vector<BoxShapes> bag_;
 };

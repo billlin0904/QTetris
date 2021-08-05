@@ -28,7 +28,7 @@ private:
 class BoxGroup : public QObject, public QGraphicsItemGroup {
     Q_OBJECT
 public:
-    BoxGroup();
+    explicit BoxGroup(RandomTetrisGenerator *generator);
 
     QRectF boundingRect() const;
 
@@ -68,4 +68,5 @@ private:
     QTransform old_transform_;
     QTimer timer_;
     QColor color_;
+    RandomTetrisGenerator* generator_;
 };

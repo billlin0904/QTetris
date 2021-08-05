@@ -57,8 +57,9 @@ void OneBox::rotate(bool anti) {
 	}
 }
 
-BoxGroup::BoxGroup()
-	: timer_(this) {
+BoxGroup::BoxGroup(RandomTetrisGenerator* generator)
+	: timer_(this)
+	, generator_(generator) {
 	setFlags(QGraphicsItem::ItemIsFocusable);
 	old_transform_ = transform();
 	QObject::connect(&timer_, SIGNAL(timeout()), this, SLOT(moveOneStep()));
@@ -259,13 +260,13 @@ void BoxGroup::createBox(const QPointF& point, BoxShapes shape) {
 	QColor color;
 
 	if (shape == RandomShape) {
-		box_shape = RandomTetrisGenerator::get().makeBoxShape();
+		box_shape = generator_->makeBoxShape();
 	}
 	else {
 		box_shape = shape;
 	}
 
-	color = RandomTetrisGenerator::get().getShapeColor(box_shape);
+	color = getShapeColor(box_shape);
 	createBox(point, box_shape, color);
 }
 

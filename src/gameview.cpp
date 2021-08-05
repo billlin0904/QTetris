@@ -31,6 +31,8 @@ GameView::GameView(QWidget* parent)
 }
 
 void GameView::init() {
+	random_generator_ = new Tetris7BagGenerator();
+
 	setRenderHint(QPainter::Antialiasing);
 	setCacheMode(CacheBackground);
 	setWindowTitle(tr("QTetris"));
@@ -48,16 +50,20 @@ void GameView::init() {
 	left_line_ = scene->addLine(197, 47, 197, 453, ThemeManager::linePen());
 	right_line_ = scene->addLine(403, 47, 403, 453, ThemeManager::linePen());
 	
-	box_group_ = new BoxGroup();
+	box_group_ = new BoxGroup(random_generator_);
 	QObject::connect(box_group_, SIGNAL(newBox()), this, SLOT(clearFullRows()));
 	QObject::connect(box_group_, SIGNAL(gameFinished()), this, SLOT(gameOver()));
 	scene->addItem(box_group_);
 
-	next_box_group_ = new BoxGroup();
-	scene->addItem(next_box_group_);
+	next_box_group_[0] = new BoxGroup(random_generator_);
+	next_box_group_[1] = new BoxGroup(random_generator_);
+	next_box_group_[2] = new BoxGroup(random_generator_);
 
-	//hint_box_group_ = new BoxGroup();
-	//scene->addItem(hint_box_group_);
+	int j = 1;
+	for (auto* box_group : next_box_group_) {
+		box_group->createBox(QPointF(460, (70 * j++)));
+		scene->addItem(box_group);
+	}
 
 	game_score_ = new QGraphicsTextItem("0");
 	game_score_->setFont(ThemeManager::font());
@@ -123,15 +129,12 @@ void GameView::init() {
 
 void GameView::initGame() {
 	box_group_->createBox(QPointF(300, 70));
-	//hint_box_group_->createBox(QPoint(300, 432), box_group_->boxShape(), box_group_->color());
-	//hint_box_group_->setOpacity(30);
 	hint_box_ = toQPixmap(box_group_);
 
 	box_group_->setFocus();
 
 	game_speed_ = kDefaultSpeed;
 	box_group_->startTimer(kDefaultSpeed);
-	next_box_group_->createBox(QPoint(500, 70));
 	scene()->setBackgroundBrush(ThemeManager::gameBackground());
 
 	game_score_->show();
@@ -205,12 +208,6 @@ void GameView::moveBox() {
 	spawnBoxUpdateNextBox();
 }
 
-void GameView::spawnBoxUpdateNextBox() {
-	box_group_->createBox(QPointF(300, 70), next_box_group_->boxShape());
-	next_box_group_->clearBoxGroup(true);
-	next_box_group_->createBox(QPointF(500, 70));
-}
-
 void GameView::pauseGame() {
 	box_group_->stopTimer();
 	mask_widget_->show();
@@ -225,37 +222,62 @@ void GameView::updateScore(int full_row_num) {
 
 }
 
+void GameView::spawnBoxUpdateNextBox() {
+	const auto cur_shape = next_box_group_[0]->boxShape();
+
+	const std::array<BoxShapes, 3> next_box_shapes{
+		next_box_group_[1]->boxShape(),
+		next_box_group_[2]->boxShape(),
+		random_generator_->makeBoxShape()
+	};
+
+	box_group_->createBox(QPointF(300, 70), cur_shape);
+
+	int i = 1;
+	int j = 0;
+	for (auto* box_group : next_box_group_) {
+		box_group->clearBoxGroup(true);
+		box_group->createBox(QPointF(460, (70 * i++)), next_box_shapes[j]);
+		++j;
+	}
+}
+
 void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
 	const auto kGridSize = 20;
 
-	QRectF const rect {
+	const QRectF line_rect {
 		200,
 		50,
 		200,
 		400,
 	};
 
+	const QRectF next_box_rect{
+		410,
+		45,
+		100,
+		210,
+	};
+
     painter->drawImage(view_rect, background_);
 
-    //painter->setBrush(QBrush(QColor(87, 206, 187)));
-    //painter->drawRect(view_rect);
+    painter->setBrush(QBrush(QColor(12, 12, 11)));
+    painter->drawRect(next_box_rect);
 
 	painter->setBrush(QBrush(QColor(12, 12, 11)));
-	painter->drawRect(rect);
+	painter->drawRect(line_rect);
 
 	painter->setPen(QColor(53, 53, 52));
-	qreal left = rect.left();
-	qreal top = rect.top();
+	qreal left = line_rect.left();
+	qreal top = line_rect.top();
 
 	QVarLengthArray<QLineF, 100> lines;
-	for (qreal x = left; x < rect.right(); x += kGridSize) {
-		lines.append(QLineF(x, rect.top(), x, rect.bottom()));
+	for (qreal x = left; x < line_rect.right(); x += kGridSize) {
+		lines.append(QLineF(x, line_rect.top(), x, line_rect.bottom()));
+	}		
+	for (qreal y = top; y < line_rect.bottom(); y += kGridSize) {
+		lines.append(QLineF(line_rect.left(), y, line_rect.right(), y));
 	}
-		
-	for (qreal y = top; y < rect.bottom(); y += kGridSize) {
-		lines.append(QLineF(rect.left(), y, rect.right(), y));
-	}
-
 	painter->drawLines(lines.data(), lines.size());
 }
 
@@ -265,7 +287,10 @@ void GameView::gameOver() {
 
 void GameView::restartGame() {
 	mask_widget_->hide();
-	next_box_group_->clearBoxGroup(true);
+	//next_box_group_->clearBoxGroup(true);
+	for (auto* box_group : next_box_group_) {
+		box_group->clearBoxGroup(true);
+	}
 	box_group_->clearBoxGroup();
 	box_group_->hide();
 

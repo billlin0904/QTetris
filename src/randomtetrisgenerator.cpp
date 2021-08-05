@@ -1,9 +1,3 @@
-#include <array>
-#include <random>
-#include <algorithm>
-
-#include <QColor>
-
 #include "box.h"
 #include "randomtetrisgenerator.h"
 
@@ -17,53 +11,37 @@ static const std::array<QColor, 7> kColorTable{
    QColor(150, 100, 100, 100)
 };
 
-static BoxShapes getBoxShape() {
+QColor getShapeColor(BoxShapes shape) {
+	return kColorTable[shape];
+}
+
+Tetris7BagGenerator::Tetris7BagGenerator()
+	: engine_(std::random_device()()) {
+}
+
+BoxShapes Tetris7BagGenerator::makeBoxShape() {
 	// https://simon.lc/the-history-of-tetris-randomizers
-	static std::vector<BoxShapes> k7Bag;
-	static BoxShapes last_shape_id = BoxShapes::RandomShape;
-	static auto engines = std::mt19937(std::random_device()());
 
 	//return BoxShapes::IShape;
 
 	auto shape_id = BoxShapes::RandomShape;
 
-	// Avoid random a same shape!
-	while (true) {
-		if (k7Bag.empty()) {
-			std::vector<BoxShapes> default_bag{
-			BoxShapes::IShape,
-			BoxShapes::JShape,
-			BoxShapes::LShape,
-			BoxShapes::OShape,
-			BoxShapes::SShape,
-			BoxShapes::TShape,
-			BoxShapes::ZShape
-			};
-			k7Bag = default_bag;
-		}
-
-		std::shuffle(k7Bag.begin(), k7Bag.end(), engines);
-		shape_id = k7Bag.back();
-
-		if (shape_id != last_shape_id) {
-			k7Bag.pop_back();
-			break;
-		}
+	if (bag_.empty()) {
+		std::vector<BoxShapes> default_bag{
+		BoxShapes::IShape,
+		BoxShapes::JShape,
+		BoxShapes::LShape,
+		BoxShapes::OShape,
+		BoxShapes::SShape,
+		BoxShapes::TShape,
+		BoxShapes::ZShape
+		};
+		bag_ = default_bag;
 	}
 
-	last_shape_id = shape_id;
+	std::shuffle(bag_.begin(), bag_.end(), engine_);
+	shape_id = bag_.back();
+	bag_.pop_back();
+
 	return shape_id;
-}
-
-BoxShapes RandomTetrisGenerator::makeBoxShape() const {
-	return getBoxShape();
-}
-
-QColor RandomTetrisGenerator::getShapeColor(BoxShapes shape) const {
-	return kColorTable[shape];
-}
-
-RandomTetrisGenerator& RandomTetrisGenerator::get() {
-	static RandomTetrisGenerator gen;
-	return gen;
 }
