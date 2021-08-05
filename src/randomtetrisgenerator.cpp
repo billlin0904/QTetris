@@ -11,8 +11,28 @@ static const std::array<QColor, 7> kColorTable{
    QColor(150, 100, 100, 100)
 };
 
+static const std::vector<BoxShapes> kDefaultBag{
+	BoxShapes::IShape,
+	BoxShapes::JShape,
+	BoxShapes::LShape,
+	BoxShapes::OShape,
+	BoxShapes::SShape,
+	BoxShapes::TShape,
+	BoxShapes::ZShape
+};
+
 QColor getShapeColor(BoxShapes shape) {
 	return kColorTable[shape];
+}
+
+NormalTetrisGenerator::NormalTetrisGenerator()
+	: engine_(std::random_device()())
+	, dist_(0, 6) {
+}
+
+
+BoxShapes NormalTetrisGenerator::makeBoxShape() {
+	return static_cast<BoxShapes>(dist_(engine_));
 }
 
 Tetris7BagGenerator::Tetris7BagGenerator()
@@ -20,23 +40,12 @@ Tetris7BagGenerator::Tetris7BagGenerator()
 }
 
 BoxShapes Tetris7BagGenerator::makeBoxShape() {
-	// https://simon.lc/the-history-of-tetris-randomizers
-
-	//return BoxShapes::IShape;
+	//return BoxShapes::OShape;
 
 	auto shape_id = BoxShapes::RandomShape;
 
 	if (bag_.empty()) {
-		std::vector<BoxShapes> default_bag{
-		BoxShapes::IShape,
-		BoxShapes::JShape,
-		BoxShapes::LShape,
-		BoxShapes::OShape,
-		BoxShapes::SShape,
-		BoxShapes::TShape,
-		BoxShapes::ZShape
-		};
-		bag_ = default_bag;
+		bag_ = kDefaultBag;
 	}
 
 	std::shuffle(bag_.begin(), bag_.end(), engine_);

@@ -10,28 +10,26 @@ SoundManager::~SoundManager() {
 }
 
 void SoundManager::playClearSound() {
-	play(0, QUrl(ThemeManager::clearSound()));
+	play(0, QUrl::fromLocalFile(ThemeManager::clearSound()));
 }
 
 void SoundManager::playFallSound() {
-    play(1, QUrl(ThemeManager::fallSound()));
+    play(1, QUrl::fromLocalFile(ThemeManager::fallSound()));
 }
 
 void SoundManager::playGameOver() {
-	play(2, QUrl(ThemeManager::gameOverSound()));
+	play(2, QUrl::fromLocalFile(ThemeManager::gameOverSound()));
 }
 
 void SoundManager::playRotateSound() {
-	play(3, QUrl(ThemeManager::rotateSound()));
+	play(3, QUrl::fromLocalFile(ThemeManager::rotateSound()));
 }
 
 void SoundManager::playMoveSound() {
-	play(4, QUrl(ThemeManager::moveSound()));
+	play(4, QUrl::fromLocalFile(ThemeManager::moveSound()));
 }
 
 void SoundManager::play(int index, QUrl const& file) {
-	auto playlist = new QMediaPlaylist();
-	playlist->addMedia(file);
-	player_[index].setPlaylist(playlist);
+	player_[index].setSource(file);
 	player_[index].play();
 }

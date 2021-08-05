@@ -190,6 +190,7 @@ void GameView::clearFullRows() {
 }
 
 void GameView::moveBox() {
+	qDebug() << "moveBox";
 	for (int i = rows_.count(); i > 0; --i) {
 		auto row = rows_.at(i - 1);
 		foreach(auto * item, 
@@ -287,7 +288,6 @@ void GameView::gameOver() {
 
 void GameView::restartGame() {
 	mask_widget_->hide();
-	//next_box_group_->clearBoxGroup(true);
 	for (auto* box_group : next_box_group_) {
 		box_group->clearBoxGroup(true);
 	}

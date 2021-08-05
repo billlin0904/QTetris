@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QSoundEffect>
 #include <QMediaPlayer>
 
 class SoundManager {
@@ -21,5 +22,6 @@ public:
 private:
 	void play(int index, QUrl const &file);
 
-	QMediaPlayer player_[5];
+	//QMediaPlayer player_[5];
+	QSoundEffect player_[5];
 };

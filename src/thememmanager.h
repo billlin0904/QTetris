@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QPixmap>
 #include <QPen>
@@ -24,23 +24,23 @@ public:
 	}
 
 	static QString clearSound() {
-		return "qrc:/QTetris/sound/clear.wav";
+		return "sound\\clear.wav";
 	}
 
 	static QString moveSound() {
-		return "qrc:/QTetris/sound/move.wav";
+		return "sound\\move.wav";
 	}
 
 	static QString fallSound() {
-		return "qrc:/QTetris/sound/fall.wav";
+		return "sound\\fall.wav";
 	}
 
 	static QString gameOverSound() {
-		return "qrc:/QTetris/sound/gameover.wav";
+		return "sound\\gameover.wav";
 	}
 
 	static QString rotateSound() {
-		return "qrc:/QTetris/sound/rotate.wav";
+		return "sound\\rotate.wav";
 	}
 
 	static QPen linePen() {

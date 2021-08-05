@@ -92,12 +92,17 @@ void BoxGroup::keyPressEvent(QKeyEvent* event) {
 }
 
 void BoxGroup::moveOneStep() {
-	moveBy(0, 20);
-	if (isColliding()) {
-		moveBy(0, -20);
-		clearBoxGroup();
-		emit newBox();
+	try {
+		moveBy(0, 20);
+		if (isColliding()) {
+			moveBy(0, -20);
+			clearBoxGroup();
+			emit newBox();
+		}
 	}
+	catch (...) {
+		moveBy(0, -20);
+	}	
 }
 
 void BoxGroup::keyPress(KeyEvents event) {
@@ -112,16 +117,20 @@ void BoxGroup::keyPress(KeyEvents event) {
 
 	switch (event) {
 	case KeyEvents::KeyDown:
-        /*
-		moveBy(0, 20);
-		while (!isColliding()) {
+		qDebug() << "KeyDown!";
+		try {
 			moveBy(0, 20);
+			while (!isColliding()) {
+				moveBy(0, 20);
+			}
+			moveBy(0, -20);
+			clearBoxGroup();
+			emit newBox();
 		}
-		moveBy(0, -20);
-		clearBoxGroup();
-		emit newBox();
-        */
-        moveOneStep();
+		catch (...) {
+			moveBy(0, -20);
+		}
+        //moveOneStep();
 		break;
 	case KeyEvents::KeyLeft:
 		moveBy(-20, 0);
@@ -136,16 +145,26 @@ void BoxGroup::keyPress(KeyEvents event) {
 		}
 		break;
 	case KeyEvents::KeyRotate:
-		rotate(90, false);
-		if (isColliding()) {
+		try {
+			rotate(90, false);
+			if (isColliding()) {
+				rotate(-90, false);
+			}
+		}
+		catch (...) {
 			rotate(-90, false);
 		}
 		break;
 	case KeyEvents::KeyAntiRotate:
-		rotate(-90, true);
-		if (isColliding()) {
-			rotate(90, false);
+		try {
+			rotate(-90, true);
+			if (isColliding()) {
+				rotate(90, false);
+			}
 		}
+		catch (...) {
+			rotate(90, false);
+		}		
 		break;
 	}
 
@@ -154,6 +173,9 @@ void BoxGroup::keyPress(KeyEvents event) {
 
 bool BoxGroup::isColliding() const {
 	auto item_list = childItems();
+	if (item_list.isEmpty()) {
+		throw std::exception("childItems is empty.");
+	}
 
 	foreach(auto item, item_list) {
 		if (item->collidingItems().count() > 1) {
