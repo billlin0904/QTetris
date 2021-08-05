@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="randomtetrisgenerator.cpp" />
     <ClCompile Include="soundmanagercpp.cpp" />
     <QtRcc Include="qtetris.qrc" />
     <ClCompile Include="box.cpp" />
@@ -97,6 +98,7 @@
   <ItemGroup>
     <QtMoc Include="gameview.h" />
     <ClInclude Include="keyevents.h" />
+    <ClInclude Include="randomtetrisgenerator.h" />
     <ClInclude Include="soundmanager.h" />
     <ClInclude Include="thememmanager.h" />
   </ItemGroup>

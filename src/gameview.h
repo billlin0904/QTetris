@@ -51,6 +51,7 @@ private:
     void play(QString const &file);
 
     qreal game_speed_;
+    QPixmap hint_box_;
     QList<int> rows_;
 
     QGraphicsTextItem* game_score_;

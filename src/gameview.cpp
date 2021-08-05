@@ -1,6 +1,7 @@
 #include <QGraphicsBlurEffect>
 #include <QPropertyAnimation>
 #include <QGraphicsScene>
+#include <QStyleOptionGraphicsItem>
 #include <QGamepad>
 #include <QSound>
 
@@ -9,6 +10,16 @@
 #include "gameview.h"
 
 static auto constexpr kDefaultSpeed = 300;
+
+static QPixmap toQPixmap(QGraphicsItem * item) {
+	QPixmap pixmap(item->boundingRect().size().toSize());
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	painter.setRenderHint(QPainter::Antialiasing);
+	QStyleOptionGraphicsItem opt;
+	item->paint(&painter, &opt);
+	return pixmap;
+}
 
 GameView::GameView(QWidget* parent)
 	: QGraphicsView(parent)
@@ -42,8 +53,8 @@ void GameView::init() {
 	next_box_group_ = new BoxGroup();
 	scene->addItem(next_box_group_);
 
-	hint_box_group_ = new BoxGroup();
-	scene->addItem(hint_box_group_);
+	//hint_box_group_ = new BoxGroup();
+	//scene->addItem(hint_box_group_);
 
 	game_score_ = new QGraphicsTextItem("0");
 	game_score_->setFont(ThemeManager::font());
@@ -107,8 +118,9 @@ void GameView::init() {
 
 void GameView::initGame() {
 	box_group_->createBox(QPointF(300, 70));
-	hint_box_group_->createBox(QPoint(300, 432), box_group_->boxShape(), box_group_->color());
-	hint_box_group_->setOpacity(30);
+	//hint_box_group_->createBox(QPoint(300, 432), box_group_->boxShape(), box_group_->color());
+	//hint_box_group_->setOpacity(30);
+	hint_box_ = toQPixmap(box_group_);
 
 	box_group_->setFocus();
 
@@ -137,7 +149,7 @@ void GameView::clearEffect(OneBox *box) {
 	auto animation = new QPropertyAnimation(box, "scale");
 	animation->setEasingCurve(QEasingCurve::OutBounce);
 	animation->setDuration(250);
-	animation->setStartValue(4);
+	animation->setStartValue(2);
 	animation->setEndValue(0.25);
 	animation->start(QAbstractAnimation::DeleteWhenStopped);
 	QObject::connect(animation, SIGNAL(finished()), box, SLOT(deleteLater()));
@@ -209,7 +221,7 @@ void GameView::updateScore(int full_row_num) {
 }
 
 void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
-	auto gridSize = 20;
+	const auto kGridSize = 20;
 
 	QRectF const rect {
 		200,
@@ -231,11 +243,11 @@ void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
 	qreal top = rect.top();
 
 	QVarLengthArray<QLineF, 100> lines;
-	for (qreal x = left; x < rect.right(); x += gridSize) {
+	for (qreal x = left; x < rect.right(); x += kGridSize) {
 		lines.append(QLineF(x, rect.top(), x, rect.bottom()));
 	}
 		
-	for (qreal y = top; y < rect.bottom(); y += gridSize) {
+	for (qreal y = top; y < rect.bottom(); y += kGridSize) {
 		lines.append(QLineF(rect.left(), y, rect.right(), y));
 	}
 

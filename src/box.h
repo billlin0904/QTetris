@@ -3,19 +3,10 @@
 #include <QGraphicsObject>
 #include <QGraphicsItemGroup>
 #include <QTimer>
+#include <QPixmap>
 
+#include "randomtetrisgenerator.h"
 #include "keyevents.h"
-
-enum BoxShapes {
-    IShape,
-    JShape, 
-    LShape,
-    OShape, 
-    SShape,
-    TShape,
-    ZShape, 
-    RandomShape
-};
 
 class OneBox : public QGraphicsObject {
 public:
@@ -32,6 +23,7 @@ public:
 private:
     int angle_{0};
     QColor color_;
+    QPixmap pixmap_;
 };
 
 class BoxGroup : public QObject, public QGraphicsItemGroup {
