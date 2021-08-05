@@ -9,15 +9,18 @@
 #include "box.h"
 #include "gameview.h"
 
-static auto constexpr kDefaultSpeed = 300;
+static auto constexpr kDefaultSpeed = 600;
 
-static QPixmap toQPixmap(QGraphicsItem * item) {
-	QPixmap pixmap(item->boundingRect().size().toSize());
+static QPixmap toQPixmap(BoxGroup* item) {
+	auto size = item->boundingRect().size().toSize();
+	QPixmap pixmap(size);
 	pixmap.fill(Qt::transparent);
 	QPainter painter(&pixmap);
 	painter.setRenderHint(QPainter::Antialiasing);
-	QStyleOptionGraphicsItem opt;
-	item->paint(&painter, &opt);
+	foreach(auto * item, item->childItems()) {
+		QStyleOptionGraphicsItem opt;
+		item->paint(&painter, &opt);
+	}
 	return pixmap;
 }
 
@@ -110,9 +113,11 @@ void GameView::init() {
 			sound_mgr_.playRotateSound();
 			break;
 		case KeyEvents::KeyAntiRotate:
-			sound_mgr_.playRotateSound();
+			sound_mgr_.playRotateSound();			
 			break;
 		}
+		hint_box_ = toQPixmap(box_group_);
+		update();
 		});
 }
 

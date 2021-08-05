@@ -13,16 +13,11 @@ enum BoxShapes {
     RandomShape
 };
 
-struct TetrisShape {
-	BoxShapes shape{ BoxShapes::RandomShape };
-	QColor color;
-};
-
 class RandomTetrisGenerator {
 public:
 	static RandomTetrisGenerator& get();
 	
-	TetrisShape makeTetrisShape() const;
+    BoxShapes makeBoxShape() const;
 
 	QColor getShapeColor(BoxShapes shape) const;
 

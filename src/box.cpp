@@ -11,8 +11,7 @@
 #include "box.h"
 
 OneBox::OneBox(const QColor& color)
-	: color_(color)
-	, pixmap_(ThemeManager::box(angle_)) {
+	: color_(color) {
 }
 
 QRectF OneBox::boundingRect() const {
@@ -25,7 +24,7 @@ QRectF OneBox::boundingRect() const {
 }
 
 void OneBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
-	painter->drawPixmap(-10, -10, 20, 20, pixmap_);
+	painter->drawPixmap(-10, -10, 20, 20, QPixmap(ThemeManager::box(angle_)));
 	painter->setBrush(color_);
 	QColor pen_color = color_;
 	pen_color.setAlpha(20);
@@ -256,20 +255,18 @@ void BoxGroup::createBox(const QPointF& point, BoxShapes shape, QColor color) {
 }
 
 void BoxGroup::createBox(const QPointF& point, BoxShapes shape) {
-	int shape_id;
+	BoxShapes box_shape;
 	QColor color;
 
 	if (shape == RandomShape) {
-		const auto random_shape = RandomTetrisGenerator::get().makeTetrisShape();
-		shape_id = random_shape.shape;
-		color = random_shape.color;
+		box_shape = RandomTetrisGenerator::get().makeBoxShape();
 	}
 	else {
-		shape_id = shape;
-		color = RandomTetrisGenerator::get().getShapeColor(shape);
+		box_shape = shape;
 	}
 
-	createBox(point, static_cast<BoxShapes>(shape_id), color);
+	color = RandomTetrisGenerator::get().getShapeColor(box_shape);
+	createBox(point, box_shape, color);
 }
 
 void BoxGroup::stopTimer() {

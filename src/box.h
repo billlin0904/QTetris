@@ -23,7 +23,6 @@ public:
 private:
     int angle_{0};
     QColor color_;
-    QPixmap pixmap_;
 };
 
 class BoxGroup : public QObject, public QGraphicsItemGroup {

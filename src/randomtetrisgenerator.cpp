@@ -23,7 +23,7 @@ static BoxShapes getBoxShape() {
 	static BoxShapes last_shape_id = BoxShapes::RandomShape;
 	static auto engines = std::mt19937(std::random_device()());
 
-	//return BoxShapes::OShape;
+	//return BoxShapes::IShape;
 
 	auto shape_id = BoxShapes::RandomShape;
 
@@ -55,12 +55,8 @@ static BoxShapes getBoxShape() {
 	return shape_id;
 }
 
-TetrisShape RandomTetrisGenerator::makeTetrisShape() const {
-	int shape_id = getBoxShape();
-	return TetrisShape{
-		static_cast<BoxShapes>(shape_id),
-		kColorTable[shape_id]
-	};
+BoxShapes RandomTetrisGenerator::makeBoxShape() const {
+	return getBoxShape();
 }
 
 QColor RandomTetrisGenerator::getShapeColor(BoxShapes shape) const {

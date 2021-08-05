@@ -86,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="randomtetrisgenerator.cpp" />
-    <ClCompile Include="soundmanagercpp.cpp" />
+    <ClCompile Include="soundmanager.cpp" />
     <QtRcc Include="qtetris.qrc" />
     <ClCompile Include="box.cpp" />
     <ClCompile Include="gameview.cpp" />
