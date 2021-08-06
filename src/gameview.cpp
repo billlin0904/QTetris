@@ -30,6 +30,8 @@ GameView::GameView(QWidget* parent)
 	init();
 }
 
+GameView::~GameView() = default;
+
 void GameView::init() {
 	random_generator_ = new Tetris7BagGenerator();
 
@@ -55,14 +57,11 @@ void GameView::init() {
 	QObject::connect(box_group_, SIGNAL(gameFinished()), this, SLOT(gameOver()));
 	scene->addItem(box_group_);
 
-	next_box_group_[0] = new BoxGroup(random_generator_);
-	next_box_group_[1] = new BoxGroup(random_generator_);
-	next_box_group_[2] = new BoxGroup(random_generator_);
-
 	int j = 1;
-	for (auto* box_group : next_box_group_) {
+	for (auto& box_group : next_box_group_) {
+		box_group.reset(new BoxGroup(random_generator_));
 		box_group->createBox(QPointF(460, (70 * j++)));
-		scene->addItem(box_group);
+		scene->addItem(box_group.get());
 	}
 
 	game_score_ = new QGraphicsTextItem("0");
@@ -88,26 +87,43 @@ void GameView::init() {
 	mask_widget_->setZValue(1);
 
 	gamepad_ = new QGamepad(0, this);
-	QObject::connect(gamepad_, &QGamepad::buttonDownChanged, this, [=](bool value) {
-		box_group_->keyPress(KeyEvents::KeyDown);
+	QObject::connect(gamepad_, &QGamepad::buttonDownChanged, this, [=](bool pressed) {
+		if (pressed) {
+			box_group_->keyPress(KeyEvents::KeyDown);
+		}
 		});
-	QObject::connect(gamepad_, &QGamepad::buttonRightChanged, this, [=](bool value) {
-		box_group_->keyPress(KeyEvents::KeyRight);
+	QObject::connect(gamepad_, &QGamepad::buttonR1Changed, this, [=](bool pressed) {
+		if (pressed) {
+			box_group_->keyPress(KeyEvents::KeyFastDown);
+		}
 		});
-	QObject::connect(gamepad_, &QGamepad::buttonLeftChanged, this, [=](bool value) {
-		box_group_->keyPress(KeyEvents::KeyLeft);
+	QObject::connect(gamepad_, &QGamepad::buttonRightChanged, this, [=](bool pressed) {
+		if (pressed) {
+			box_group_->keyPress(KeyEvents::KeyRight);
+		}
+		});
+	QObject::connect(gamepad_, &QGamepad::buttonLeftChanged, this, [=](bool pressed) {
+		if (pressed) {
+			box_group_->keyPress(KeyEvents::KeyLeft);
+		}
 		});
 	QObject::connect(gamepad_, &QGamepad::buttonAChanged, this, [=](bool pressed) {
-		box_group_->keyPress(KeyEvents::KeyRotate);
+		if (pressed) {
+			box_group_->keyPress(KeyEvents::KeyRotate);
+		}
 		});
 	QObject::connect(gamepad_, &QGamepad::buttonBChanged, this, [=](bool pressed) {
-		box_group_->keyPress(KeyEvents::KeyAntiRotate);
+		if (pressed) {
+			box_group_->keyPress(KeyEvents::KeyAntiRotate);
+		}
 		});
 
 	QObject::connect(box_group_, &BoxGroup::updateKeyPress, [this](KeyEvents event) {
 		switch (event) {
-		case KeyEvents::KeyDown:
+		case KeyEvents::KeyFastDown:
 			sound_mgr_.playFallSound();
+			break;
+		case KeyEvents::KeyDown:
 			break;
 		case KeyEvents::KeyLeft:
 			sound_mgr_.playMoveSound();
@@ -173,7 +189,7 @@ void GameView::clearFullRows() {
 			Qt::ContainsItemShape,
 			Qt::DescendingOrder);
 		if (list.count() == 10) {
-			foreach(QGraphicsItem * item, list) {
+			foreach(auto * item, list) {
 				clearEffect(dynamic_cast<OneBox*>(item));
 			}
 			rows_ << y;
@@ -236,7 +252,7 @@ void GameView::spawnBoxUpdateNextBox() {
 
 	int i = 1;
 	int j = 0;
-	for (auto* box_group : next_box_group_) {
+	for (auto& box_group : next_box_group_) {
 		box_group->clearBoxGroup(true);
 		box_group->createBox(QPointF(460, (70 * i++)), next_box_shapes[j]);
 		++j;
@@ -283,12 +299,13 @@ void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
 }
 
 void GameView::gameOver() {
-	restartGame();
+	sound_mgr_.playGameOver();
+	QTimer::singleShot(6500, this, SLOT(restartGame()));
 }
 
 void GameView::restartGame() {
 	mask_widget_->hide();
-	for (auto* box_group : next_box_group_) {
+	for (auto& box_group : next_box_group_) {
 		box_group->clearBoxGroup(true);
 	}
 	box_group_->clearBoxGroup();

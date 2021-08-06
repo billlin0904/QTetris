@@ -22,6 +22,8 @@ class GameView : public QGraphicsView {
 public:
 	explicit GameView(QWidget* parent = nullptr);
 
+    virtual ~GameView();
+
 public slots:
     void startGame();
 
@@ -73,9 +75,9 @@ private:
     QGraphicsTextItem* game_over_text_;
 
     BoxGroup* box_group_;
-    std::array<BoxGroup*, 3> next_box_group_;
     QGamepad* gamepad_;
     RandomTetrisGenerator* random_generator_;
     SoundManager sound_mgr_;
     QImage background_;
+    std::array<std::unique_ptr<BoxGroup>, 3> next_box_group_;
 };

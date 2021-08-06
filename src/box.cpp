@@ -116,7 +116,7 @@ void BoxGroup::keyPress(KeyEvents event) {
 	QGraphicsItem* item = nullptr;
 
 	switch (event) {
-	case KeyEvents::KeyDown:
+	case KeyFastDown:
 		qDebug() << "KeyDown!";
 		try {
 			moveBy(0, 20);
@@ -130,19 +130,32 @@ void BoxGroup::keyPress(KeyEvents event) {
 		catch (...) {
 			moveBy(0, -20);
 		}
-        //moveOneStep();
+		break;
+	case KeyEvents::KeyDown:
+		qDebug() << "KeyDown!";
+        moveOneStep();
 		break;
 	case KeyEvents::KeyLeft:
-		moveBy(-20, 0);
-		if (isColliding()) {
-			moveBy(20, 0);
+		try {
+			moveBy(-20, 0);
+			if (isColliding()) {
+				moveBy(20, 0);
+			}
 		}
+		catch (...) {
+			moveBy(-20, 0);
+		}		
 		break;
 	case KeyEvents::KeyRight:
-		moveBy(20, 0);
-		if (isColliding()) {
-			moveBy(-20, 0);
+		try {
+			moveBy(20, 0);
+			if (isColliding()) {
+				moveBy(-20, 0);
+			}
 		}
+		catch (...) {
+			moveBy(20, 0);
+		}		
 		break;
 	case KeyEvents::KeyRotate:
 		try {

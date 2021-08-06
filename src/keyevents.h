@@ -6,5 +6,6 @@ enum KeyEvents {
     KeyLeft,
     KeyRight,
     KeyRotate,
-    KeyAntiRotate
+    KeyAntiRotate,
+    KeyFastDown
 };
