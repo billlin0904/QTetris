@@ -3,9 +3,10 @@
 #include <array>
 #include <random>
 #include <algorithm>
+#include <deque>
+#include <vector>
 
 #include <QColor>
-#include <vector>
 
 enum BoxShapes {
     IShape,
@@ -26,6 +27,8 @@ public:
 
     virtual BoxShapes makeBoxShape() = 0;
 
+    virtual void reset() = 0;
+
 protected:
     RandomTetrisGenerator() = default;
 };
@@ -38,18 +41,35 @@ public:
 
     BoxShapes makeBoxShape() override;
 
+    void reset() override;
 private:
     std::mt19937 engine_;
     std::uniform_int_distribution<int> dist_;
+};
+
+class TestTetrisGenerator : public RandomTetrisGenerator {
+public:
+    explicit TestTetrisGenerator(std::deque<BoxShapes> const & shapes);
+
+    BoxShapes makeBoxShape() override;
+
+    void reset() override;
+
+private:
+    std::deque<BoxShapes> const test_bag_;
+    std::deque<BoxShapes> bag_;
 };
 
 class Tetris7BagGenerator : public RandomTetrisGenerator {
 public:
     Tetris7BagGenerator();
 
+    void reset() override;
+
     BoxShapes makeBoxShape() override;
 
 private:
+    static const std::vector<BoxShapes> kDefaultBag;
     std::mt19937 engine_;
     std::vector<BoxShapes> bag_;
 };

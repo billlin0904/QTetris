@@ -11,7 +11,7 @@ static const std::array<QColor, 7> kColorTable{
    QColor(150, 100, 100, 100)
 };
 
-static const std::vector<BoxShapes> kDefaultBag{
+const std::vector<BoxShapes> Tetris7BagGenerator::kDefaultBag{
 	BoxShapes::IShape,
 	BoxShapes::JShape,
 	BoxShapes::LShape,
@@ -35,8 +35,32 @@ BoxShapes NormalTetrisGenerator::makeBoxShape() {
 	return static_cast<BoxShapes>(dist_(engine_));
 }
 
+void NormalTetrisGenerator::reset() {
+}
+
+TestTetrisGenerator::TestTetrisGenerator(std::deque<BoxShapes> const & shapes)
+    : test_bag_(shapes) {
+}
+
+void TestTetrisGenerator::reset() {
+    bag_.clear();
+}
+
+BoxShapes TestTetrisGenerator::makeBoxShape() {
+    if (bag_.empty()) {
+        bag_ = test_bag_;
+    }
+    auto shape = bag_.front();
+    bag_.pop_front();
+    return shape;
+}
+
 Tetris7BagGenerator::Tetris7BagGenerator()
 	: engine_(std::random_device()()) {
+}
+
+void Tetris7BagGenerator::reset() {
+    bag_.clear();
 }
 
 BoxShapes Tetris7BagGenerator::makeBoxShape() {

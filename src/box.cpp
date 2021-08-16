@@ -2,10 +2,12 @@
 #include <random>
 #include <algorithm>
 
+#include <QGuiApplication>
 #include <QKeyEvent>
 #include <QPainter>
 #include <QDebug>
 
+#include "keystate.h"
 #include "randomtetrisgenerator.h"
 #include "thememmanager.h"
 #include "box.h"
@@ -23,7 +25,7 @@ QRectF OneBox::boundingRect() const {
 		20 + pen_width);
 }
 
-void OneBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+void OneBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/) {
 	painter->drawPixmap(-10, -10, 20, 20, QPixmap(ThemeManager::box(angle_)));
 	painter->setBrush(color_);
 	QColor pen_color = color_;
@@ -71,26 +73,6 @@ QRectF BoxGroup::boundingRect() const {
 	return QRectF(-40 - pen_width / 2, -40 - pen_width / 2, 80 + pen_width, 80 + pen_width);
 }
 
-void BoxGroup::keyPressEvent(QKeyEvent* event) {
-	switch (event->key()) {
-	case Qt::Key_Down:
-		keyPress(KeyEvents::KeyDown);
-		break;
-	case Qt::Key_Left:
-		keyPress(KeyEvents::KeyLeft);
-		break;
-	case Qt::Key_Right:
-		keyPress(KeyEvents::KeyRight);
-		break;
-	case Qt::Key_Space:
-		keyPress(KeyEvents::KeyRotate);
-		break;
-	case Qt::Key_Alt:
-		keyPress(KeyEvents::KeyAntiRotate);
-		break;
-	}
-}
-
 void BoxGroup::moveOneStep() {
 	try {
 		moveBy(0, 20);
@@ -106,7 +88,7 @@ void BoxGroup::moveOneStep() {
 }
 
 void BoxGroup::keyPress(KeyEvents event) {
-#define rotate(angle, anti) \
+#define rotateBox(angle, anti) \
 	setTransform(QTransform().rotate(angle), true); \
 	foreach(item, childItems()) {\
 		auto box = dynamic_cast<OneBox*>(item);\
@@ -118,7 +100,7 @@ void BoxGroup::keyPress(KeyEvents event) {
 	switch (event) {
 	case KeyFastDown:
 		qDebug() << "KeyDown!";
-		try {
+        try {
 			moveBy(0, 20);
 			while (!isColliding()) {
 				moveBy(0, 20);
@@ -147,6 +129,7 @@ void BoxGroup::keyPress(KeyEvents event) {
 		}		
 		break;
 	case KeyEvents::KeyRight:
+        qDebug() << "KeyRight!";
 		try {
 			moveBy(20, 0);
 			if (isColliding()) {
@@ -159,35 +142,66 @@ void BoxGroup::keyPress(KeyEvents event) {
 		break;
 	case KeyEvents::KeyRotate:
 		try {
-			rotate(90, false);
+            rotateBox(90, false)
 			if (isColliding()) {
-				rotate(-90, false);
+                auto reset_box = true;
+                auto press_rotate = isPress(KeyEvents::KeyRotate);
+                qDebug() << "Is keypress rotate " << press_rotate;
+                if (press_rotate) {
+                    //moveBy(0, 20);
+                    //rotateBox(90, false)
+                    reset_box = isColliding();
+                    if (reset_box) {
+                        qDebug() << "T-Spin";
+                    } else {
+                        moveBy(0, -20);
+                        rotateBox(-90, false)
+                        qDebug() << "reset_box";
+                    }
+                } else {
+                    rotateBox(-90, false)
+                }
 			}
 		}
 		catch (...) {
-			rotate(-90, false);
+            rotateBox(-90, false)
 		}
 		break;
 	case KeyEvents::KeyAntiRotate:
 		try {
-			rotate(-90, true);
+            rotateBox(-90, true)
 			if (isColliding()) {
-				rotate(90, false);
+                auto reset_box = true;
+                auto press_rotate = isPress(KeyEvents::KeyAntiRotate);
+                qDebug() << "Is keypress rotate " << press_rotate;
+                if (press_rotate) {
+                    moveBy(0, 20);
+                    //rotateBox(-90, false)
+                    reset_box = isColliding();
+                    if (reset_box) {
+                        rotateBox(-90, false)
+                        qDebug() << "T-Spin";
+                    } else {
+                        //moveBy(0, -20);
+                        //rotateBox(90, true)
+                        qDebug() << "reset_box";
+                    }
+                } else {
+                    rotateBox(90, false)
+                }
 			}
 		}
 		catch (...) {
-			rotate(90, false);
+            rotateBox(90, false)
 		}		
 		break;
 	}
-
-	emit updateKeyPress(event);
 }
 
 bool BoxGroup::isColliding() const {
 	auto item_list = childItems();
 	if (item_list.isEmpty()) {
-		throw std::exception("childItems is empty.");
+        throw Exception("childItems is empty.");
 	}
 
 	foreach(auto item, item_list) {
@@ -219,14 +233,21 @@ BoxShapes BoxGroup::boxShape() const {
 	return shape_;
 }
 
+OneBox* BoxGroup::createBox() {
+    setTransform(old_transform_);
+    auto* box = new OneBox(getShapeColor(BoxShapes::IShape));
+    addToGroup(box);
+    return box;
+}
+
 void BoxGroup::createBox(const QPointF& point, BoxShapes shape, QColor color) {
 	QList<OneBox*> list;
 	setTransform(old_transform_);
 
 	for (int i = 0; i < 4; ++i) {
-		auto temp = new OneBox(color);
-		list << temp;
-		addToGroup(temp);
+        auto box = new OneBox(color);
+        list << box;
+        addToGroup(box);
 	}
 
 	switch (shape) {

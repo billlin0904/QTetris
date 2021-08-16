@@ -13,10 +13,20 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 HEADERS += ./keyevents.h \
     ./thememmanager.h \
     ./soundmanager.h \
+    ./randomtetrisgenerator.h \
     ./box.h \
-    ./gameview.h
+    ./gameview.h \
+    keystate.h
+
 SOURCES += ./box.cpp \
-    ./soundmanagercpp.cpp \
+    ./soundmanager.cpp \
+    ./randomtetrisgenerator.cpp \
     ./gameview.cpp \
-    ./main.cpp
+    ./main.cpp \
+    keystate.cpp
+
 RESOURCES += qtetris.qrc
+
+LIBS += -framework Foundation -framework Carbon \
+
+INCLUDEPATH += /System/Library/Frameworks/Foundation.framework/Versions/C/Headers \

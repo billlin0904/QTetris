@@ -10,5 +10,6 @@
         <file>sound/rotate.wav</file>
         <file>sound/move.wav</file>
         <file>background/background.jpg</file>
+        <file>background/small_background</file>
     </qresource>
 </RCC>

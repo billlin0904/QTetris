@@ -1,5 +1,7 @@
 #pragma once
 
+#include <exception>
+
 #include <QGraphicsObject>
 #include <QGraphicsItemGroup>
 #include <QTimer>
@@ -8,13 +10,28 @@
 #include "randomtetrisgenerator.h"
 #include "keyevents.h"
 
+class Exception : public std::exception {
+public:
+    explicit Exception(const char *what = "")
+        : what_(what) {
+    }
+
+    virtual ~Exception() override = default;
+
+    const char * what() const noexcept override {
+        return what_;
+    }
+private:
+    const char *what_;
+};
+
 class OneBox : public QGraphicsObject {
 public:
     explicit OneBox(const QColor& color = Qt::red);
 
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
 
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
     QPainterPath shape() const;
 
@@ -30,9 +47,11 @@ class BoxGroup : public QObject, public QGraphicsItemGroup {
 public:
     explicit BoxGroup(RandomTetrisGenerator *generator);
 
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
 
     void clearBoxGroup(bool destroy_box = false);
+
+    OneBox * createBox();
 
     void createBox(const QPointF& point, BoxShapes shape, QColor color);
 
@@ -44,15 +63,10 @@ public:
 
     QColor color() const;
 
-protected:
-    void keyPressEvent(QKeyEvent* event);
-
 signals:
     void newBox();
 
     void gameFinished();
-
-    void updateKeyPress(KeyEvents event);
 
 public slots:
     void moveOneStep();

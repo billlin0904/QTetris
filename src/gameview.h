@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <memory>
+#include <functional>
 
 #include <QGraphicsView>
 #include <QGraphicsProxyWidget>
@@ -17,12 +19,16 @@ class RandomTetrisGenerator;
 class QGamepad;
 class QGraphicsBlurEffect;
 
+using BoxTag = std::array<char, 10 * 20>;
+
 class GameView : public QGraphicsView {
 	Q_OBJECT
 public:
-	explicit GameView(QWidget* parent = nullptr);
+    explicit GameView(RandomTetrisGenerator *generator = nullptr, QWidget* parent = nullptr);
 
-    virtual ~GameView();
+    virtual ~GameView() override;
+
+    void keyPress(KeyEvents event);
 
 public slots:
     void startGame();
@@ -41,21 +47,32 @@ public slots:
 
     void updateScore(int full_row_num);
 
+    void setScriptAction(std::function<void(GameView *)> action) {
+        script_action_ = action;
+    }
+
+    void setBoxTag(BoxTag const &tags);
+
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
 
+    void keyPressEvent(QKeyEvent* event) override;
+
 private:
-    void spawnBoxUpdateNextBox();
+    void spawnBox();
 
     void clearEffect(OneBox* box);
 
-    void init();
+    void init(RandomTetrisGenerator *generator);
 
     void initGame();
 
     void play(QString const &file);
 
-    qreal game_speed_;
+    static const auto kGridSize = 20;
+    static const auto kNextBoxShapeSize = 3;
+
+    int game_speed_;
     QPixmap hint_box_;
     QList<int> rows_;
 
@@ -76,8 +93,10 @@ private:
 
     BoxGroup* box_group_;
     QGamepad* gamepad_;
-    RandomTetrisGenerator* random_generator_;
+    std::unique_ptr<RandomTetrisGenerator> random_generator_;
+    std::function<void(GameView *)> script_action_;
     SoundManager sound_mgr_;
     QImage background_;
-    std::array<std::unique_ptr<BoxGroup>, 3> next_box_group_;
+    QImage small_background_;
+    std::array<std::unique_ptr<BoxGroup>, kNextBoxShapeSize> next_box_group_;
 };
