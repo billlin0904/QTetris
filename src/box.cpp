@@ -87,14 +87,15 @@ void BoxGroup::moveOneStep() {
 	}	
 }
 
-void BoxGroup::keyPress(KeyEvents event) {
-#define rotateBox(angle, anti) \
-	setTransform(QTransform().rotate(angle), true); \
-	foreach(item, childItems()) {\
-		auto box = dynamic_cast<OneBox*>(item);\
-		box->rotate(anti);\
-	}
+void BoxGroup::rotateBox(int32_t angle, bool is_anti) {
+    setTransform(QTransform().rotate(angle), true);
+    foreach(auto *item, childItems()) {
+        auto box = dynamic_cast<OneBox*>(item);
+        box->rotate(is_anti);
+    }
+}
 
+void BoxGroup::keyPress(KeyEvents event) {
 	QGraphicsItem* item = nullptr;
 
 	switch (event) {
@@ -142,44 +143,61 @@ void BoxGroup::keyPress(KeyEvents event) {
 		break;
 	case KeyEvents::KeyRotate:
 		try {
-            rotateBox(90, false)
-			if (isColliding()) {
-                auto reset_box = true;
-                auto press_rotate = isPress(KeyEvents::KeyRotate);
-                qDebug() << "Is keypress rotate " << press_rotate;
-                if (press_rotate) {
-                    //moveBy(0, 20);
-                    //rotateBox(90, false)
-                    reset_box = isColliding();
-                    if (reset_box) {
+            qDebug() << "KeyRotate";
+            rotateBox(90, false);
+            if (isColliding()) {
+                if (isPress(KeyEvents::KeyRotate)) {
+                    rotateBox(90, false);
+                    if (!isColliding()) {
+                        rotateBox(-90, false);
+                        moveBy(0, 20);
                         qDebug() << "T-Spin";
                     } else {
-                        moveBy(0, -20);
-                        rotateBox(-90, false)
-                        qDebug() << "reset_box";
+                        rotateBox(-90, false);
+                        qDebug() << "break 2";
+                        return;
                     }
                 } else {
-                    rotateBox(-90, false)
+                    rotateBox(-90, false);
+                    qDebug() << "break 2";
+                    return;
                 }
+
+                QTimer::singleShot(100, [this]() {
+                    if (isPress(KeyEvents::KeyRotate)) {
+                        try {
+                            rotateBox(90, false);
+                            if (!isColliding()) {
+                                moveBy(-20, 20);
+                                moveBy(0, 20);
+                                qDebug() << "timer";
+                            }
+                        }  catch (...) {
+                            rotateBox(-90, false);
+                            qDebug() << "timer got exception!";
+                        }
+                    }
+                });
 			}
 		}
 		catch (...) {
-            rotateBox(-90, false)
+            rotateBox(-90, false);
+            qDebug() << "got exception!";
 		}
 		break;
 	case KeyEvents::KeyAntiRotate:
 		try {
-            rotateBox(-90, true)
-			if (isColliding()) {
+            rotateBox(-90, true);
+            if (isColliding()) {
                 auto reset_box = true;
                 auto press_rotate = isPress(KeyEvents::KeyAntiRotate);
                 qDebug() << "Is keypress rotate " << press_rotate;
                 if (press_rotate) {
                     moveBy(0, 20);
-                    //rotateBox(-90, false)
+                    rotateBox(-90, false);
                     reset_box = isColliding();
                     if (reset_box) {
-                        rotateBox(-90, false)
+                        rotateBox(-90, false);
                         qDebug() << "T-Spin";
                     } else {
                         //moveBy(0, -20);
@@ -187,12 +205,12 @@ void BoxGroup::keyPress(KeyEvents event) {
                         qDebug() << "reset_box";
                     }
                 } else {
-                    rotateBox(90, false)
+                    rotateBox(90, false);
                 }
 			}
 		}
 		catch (...) {
-            rotateBox(90, false)
+            rotateBox(90, false);
 		}		
 		break;
 	}
@@ -206,7 +224,7 @@ bool BoxGroup::isColliding() const {
 
 	foreach(auto item, item_list) {
 		if (item->collidingItems().count() > 1) {
-			qDebug() << "Colliding!";
+            //qDebug() << "Colliding!";
 			return true;
 		}
 	}

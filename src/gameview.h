@@ -89,7 +89,7 @@ private:
 
     QGraphicsTextItem* game_welcome_text_;
     QGraphicsTextItem* game_pause_text_;
-    QGraphicsTextItem* game_over_text_;
+    QGraphicsTextItem* tspin_text_;
 
     BoxGroup* box_group_;
     QGamepad* gamepad_;

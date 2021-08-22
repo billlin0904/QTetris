@@ -26,7 +26,6 @@ static QPixmap toQPixmap(BoxGroup* item) {
 
 GameView::GameView(RandomTetrisGenerator *generator, QWidget* parent)
 	: QGraphicsView(parent)
-    , script_action_([](auto *) {})
     , background_(ThemeManager::backgroundImage())
     , small_background_(ThemeManager::smallBackgroundImage()) {
     init(generator);
@@ -65,6 +64,13 @@ void GameView::init(RandomTetrisGenerator *generator) {
 	game_level_ = new QGraphicsTextItem("0");
 	game_level_->setFont(ThemeManager::font());
 	game_level_->setPos(20, 150);
+
+    tspin_text_ = new QGraphicsTextItem();
+    tspin_text_->setFont(ThemeManager::font());
+    tspin_text_->setPos(230, 220);
+    tspin_text_->setZValue(2);
+    tspin_text_->hide();
+    scene->addItem(tspin_text_);
 
 	top_line_->hide();
 	bottom_line_->hide();
@@ -121,12 +127,8 @@ void GameView::keyPress(KeyEvents event) {
 void GameView::initGame() {
     random_generator_->reset();
 
-    if (!script_action_) {
-        box_group_->createBox(QPointF(300, 70));
-        hint_box_ = toQPixmap(box_group_);
-    } else {
-        script_action_(this);
-    }
+    //box_group_->createBox(QPointF(300, 70));
+    //hint_box_ = toQPixmap(box_group_);
 
     box_group_->setFocus();
 
@@ -148,6 +150,8 @@ void GameView::initGame() {
 	left_line_->show();
 	right_line_->show();
 	box_group_->show();
+
+    script_action_(this);
 }
 
 void GameView::startGame() {
@@ -224,7 +228,18 @@ void GameView::returnGame() {
 }
 
 void GameView::updateScore(int full_row_num) {
+    if (full_row_num == 3) {
+        tspin_text_->setHtml(tr("<font color=white>T-Spin</font>"));
+    } else if (full_row_num == 2) {
+        tspin_text_->setHtml(tr("<font color=white>Double</font>"));
+    } else if (full_row_num == 1) {
+        tspin_text_->setHtml(tr("<font color=white>Single</font>"));
+    }
 
+    tspin_text_->show();
+    QTimer::singleShot(400, [this]() {
+        tspin_text_->hide();
+    });
 }
 
 void GameView::spawnBox() {
@@ -289,14 +304,14 @@ void GameView::setBoxTag(BoxTag const &tags) {
             auto* box = box_group_->createBox();
             box->setPos(QPointF(((x % 10) * -20), ((y % 20) * -20)));
         }
-        qDebug() << (x % 10) * -20 << "," << (y % 20) * -20;
+        //qDebug() << (x % 10) * -20 << "," << (y % 20) * -20;
         ++x;
         if (x % 10 == 0) {
             ++y;
         }
     }
 
-    box_group_->setPos(QPointF(390, 402));
+    box_group_->setPos(QPointF(390, 440));
 }
 
 void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {    
@@ -344,8 +359,9 @@ void GameView::drawBackground(QPainter* painter, const QRectF& view_rect) {
 }
 
 void GameView::gameOver() {
-	sound_mgr_.playGameOver();
-	QTimer::singleShot(6500, this, SLOT(restartGame()));
+    //sound_mgr_.playGameOver();
+    //QTimer::singleShot(6500, this, SLOT(restartGame()));
+    restartGame();
 }
 
 void GameView::restartGame() {
@@ -356,17 +372,13 @@ void GameView::restartGame() {
 	box_group_->clearBoxGroup();
 	box_group_->hide();
 
-	foreach(auto * item,
-		scene()->items(
-			199,
-			49,
-			202,
-			402,
-			Qt::ContainsItemBoundingRect,
-			Qt::DescendingOrder)) {
-		scene()->removeItem(item);
-		auto box = dynamic_cast<OneBox*>(item);
-		box->deleteLater();
-	}
+    foreach(auto * item,
+             scene()->items()) {
+        auto box = dynamic_cast<OneBox*>(item);
+        if (box != nullptr) {
+            scene()->removeItem(item);
+            box->deleteLater();
+        }
+    }
 	initGame();
 }

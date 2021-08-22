@@ -33,7 +33,7 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
-    QPainterPath shape() const;
+    QPainterPath shape() const override;
 
     void rotate(bool anti);
 
@@ -78,6 +78,8 @@ public slots:
     void keyPress(KeyEvents event);
 
 private:
+    void rotateBox(int32_t angle, bool is_anti);
+
     BoxShapes shape_;
     QTransform old_transform_;
     QTimer timer_;

@@ -77,28 +77,29 @@ int main(int argc, char *argv[]) {
     view.show();
 
     view.setScriptAction([](auto *view) {
-        BoxTag const tags {
+        BoxTag tags {
             'z','z','z','z','z','z','z','z','z','z',
             'z','z','z','z','z','z','z','z','z','z',
             'z','z','z','z','z','z','z','z','z','z',
             'z','z','z','z','z','z','z','z','z','z',
             'z','z','z','z','z','z','z','z','z','z',
-            'z','z','z','z','z','z','z','z','x','x',
-            'x','x','x','x','x','x','x','z','z','x',
-            'x','x','x','x','x','x','x','z','x','x',
-            'x','x','x','x','x','x','x','z','x','x',
-            'x','x','x','x','x','x','x','z','z','x',
-            'x','x','x','x','x','x','x','z','x','x',
-            'x','x','x','x','x','x','x','z','x','x',
-            'x','x','x','x','x','x','x','z','z','x',
-            'x','x','x','x','x','x','x','z','x','x',
-            'x','x','x','x','x','x','x','z','x','x',
-            'x','x','x','x','x','x','x','z','z','x',
-            'x','x','x','x','x','x','x','z','x','x',
+            'z','z','z','z','z','z','z','z','z','z',
+            'z','z','z','z','z','z','z','z','z','z',
+            'z','z','z','z','z','z','z','z','z','z',
+            'z','z','z','z','z','z','z','z','z','z',
+            'z','z','z','z','z','z','z','z','z','z',
+            'z','z','z','z','z','z','z','z','z','z',
+            'x','x','x','x','x','x','x','x','z','z',
+            'x','x','x','x','x','x','x','z','z','z',
             'x','x','x','x','x','x','x','z','x','x',
             'x','x','x','x','x','x','x','z','z','x',
+            'x','x','x','x','x','x','x','z','x','x',
+            'x','x','x','x','x','x','x','z','x','x',
+            'x','x','x','x','x','x','x','z','z','x',
+            'x','x','x','x','x','x','x','z','x','x',
             'x','x','x','x','x','x','x','z','x','x',
             };
+        std::reverse(tags.begin(), tags.end());
         view->setBoxTag(tags);
     });
     view.startGame();

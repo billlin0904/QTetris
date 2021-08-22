@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QPen>
 #include <QFont>
+#include <QApplication>
 
 class ThemeManager {
 public:
@@ -28,23 +29,23 @@ public:
 	}
 
 	static QString clearSound() {
-		return "sound\\clear.wav";
+        return qApp->applicationDirPath() + "//sound//clear.wav";
 	}
 
 	static QString moveSound() {
-		return "sound\\move.wav";
+        return qApp->applicationDirPath() + "//sound//move.wav";
 	}
 
 	static QString fallSound() {
-		return "sound\\fall.wav";
+        return qApp->applicationDirPath() + "//sound//fall.wav";
 	}
 
 	static QString gameOverSound() {
-		return "sound\\gameover.wav";
+        return qApp->applicationDirPath() + "//sound//gameover.wav";
 	}
 
 	static QString rotateSound() {
-		return "sound\\rotate.wav";
+        return qApp->applicationDirPath() + "//sound//rotate.wav";
 	}
 
 	static QPen linePen() {
