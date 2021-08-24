@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="keystate.cpp" />
     <ClCompile Include="randomtetrisgenerator.cpp" />
     <ClCompile Include="soundmanager.cpp" />
     <QtRcc Include="qtetris.qrc" />

@@ -2,6 +2,6 @@
 
 #include "keyevents.h"
 
-bool isPress(KeyEvents key);
+bool isPress(KeyEvents key) noexcept;
 
 
